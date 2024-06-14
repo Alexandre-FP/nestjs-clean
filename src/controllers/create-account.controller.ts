@@ -1,5 +1,5 @@
 import { Body, Controller, Post, HttpCode, UsePipes } from '@nestjs/common'
-import { UserPrismaRepository } from 'src/prisma/prisma-repository/prisma-repository'
+import { PrismaRepository } from 'src/prisma/prisma-repository/prisma-repository'
 import { hash } from 'bcryptjs'
 import { z } from 'zod'
 import { ZodValidationPipe } from 'src/pipes/zod-validation-pipes'
@@ -12,9 +12,9 @@ const createAccountSchema = z.object({
 
 type CreateAccounBodySchema = z.infer<typeof createAccountSchema>
 
-@Controller('/account')
+@Controller('/accounts')
 export class CreateAccountController {
-  constructor(private userRepository: UserPrismaRepository) {}
+  constructor(private prismaRepository: PrismaRepository) {}
 
   @Post()
   @HttpCode(201)
@@ -22,10 +22,10 @@ export class CreateAccountController {
   async handle(@Body() body: CreateAccounBodySchema) {
     const { email, name, password } = body
 
-    await this.userRepository.findByEmail(email)
+    await this.prismaRepository.findByEmail(email)
 
     const passwordHash = await hash(password, 8)
 
-    await this.userRepository.create({ email, name, password: passwordHash })
+    await this.prismaRepository.create({ email, name, password: passwordHash })
   }
 }
