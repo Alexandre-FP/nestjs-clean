@@ -48,13 +48,52 @@ export class PrismaRepository {
     return user
   }
 
-  async createQuestion(
-    data: Prisma.QuestionUncheckedCreateInput,
-  ): Promise<Question> {
+  async createQuestion(data: Prisma.QuestionUncheckedCreateInput) {
     const question = await this.prismaRepository.question.create({
       data,
     })
 
     return question
+  }
+
+  async fetchRecentQuestion(
+    userId: string,
+    page: number,
+  ): Promise<Question[] | null> {
+    const question = await this.prismaRepository.question.findMany({
+      where: {
+        authorId: userId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        author: {
+          select: {
+            password: false,
+            email: false,
+            name: true,
+          },
+        },
+      },
+      take: 7, // quantos registro quero mostrar por página
+      skip: (page - 1) * 1,
+    })
+
+    return question
+  }
+
+  async findBySlug(slug: string): Promise<Question | null> {
+    const quastionSlug = await this.prismaRepository.question.findUnique({
+      where: {
+        slug,
+      },
+    })
+
+    if (quastionSlug) {
+      throw new ConflictException('Slug allready exist.')
+    }
+
+    return quastionSlug
   }
 }
