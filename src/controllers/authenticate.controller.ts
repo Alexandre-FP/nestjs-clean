@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UsePipes } from '@nestjs/common'
+import { Body, Controller, HttpCode, Post } from '@nestjs/common'
 import { PrismaRepository } from 'src/prisma/prisma-repository/prisma-repository'
 import { z } from 'zod'
 import { ZodValidationPipe } from 'src/pipes/zod-validation-pipes'
@@ -19,8 +19,11 @@ export class AuthenticateController {
   ) {}
 
   @Post()
-  @UsePipes(new ZodValidationPipe(authenticateBodySchema))
-  async handle(@Body() body: AuthenticateBodySchema) {
+  @HttpCode(200)
+  async handle(
+    @Body(new ZodValidationPipe(authenticateBodySchema))
+    body: AuthenticateBodySchema,
+  ) {
     const { email, password } = body
 
     const user = await this.prismaRepository.login(email, password)
