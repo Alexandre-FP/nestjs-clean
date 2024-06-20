@@ -16,6 +16,9 @@
  - decoretors é uma função ela tra um comportamento especifico em algo
  - exemplo => @Controller(), @Get
 
+- Mappers
+ - são class responsaveis por converter uma entidade em um formato de uma camada para o formatado de uma outra camada
+
 ## Configuração do JWT
 
 # Gerar a chave privada
